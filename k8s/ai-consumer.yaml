@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ai-consumer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ai-consumer
+  template:
+    metadata:
+      labels:
+        app: ai-consumer
+    spec:
+      containers:
+        - name: ai-consumer
+          image: ai-consumer:latest
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: KAFKA_BOOTSTRAP
+              value: kafka:9092
+            - name: GROUP_ID
+              value: ai-consumer
+            - name: INPUT_TOPIC
+              value: transactions
+            - name: PREDICTIONS_TOPIC
+              value: predictions
+

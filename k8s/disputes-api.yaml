@@ -1,0 +1,58 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: disputes-api
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8000
+      targetPort: 8000
+  selector:
+    app: disputes-api
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: disputes-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: disputes-api
+  template:
+    metadata:
+      labels:
+        app: disputes-api
+    spec:
+      containers:
+        - name: disputes-api
+          image: disputes-api:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+          env:
+            - name: DATA_FILE
+              value: /data/disputes.json
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      volumes:
+        - name: data
+          emptyDir: {}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: disputes-api
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: disputes-api
+                port:
+                  number: 8000
+
