@@ -13,9 +13,20 @@ from typing import Any, Dict, Optional
 
 from confluent_kafka import Consumer, Producer
 
+import jev_inference
+
+USE_JEV = bool(os.getenv("TYPESAFE_API_KEY"))
+
 
 def run_inference(transaction: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     """Compute risk score and human-readable reason for a transaction."""
+    if USE_JEV:
+        return jev_inference.run_inference(transaction)
+    return _run_rule_based_inference(transaction)
+
+
+def _run_rule_based_inference(transaction: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    """Fallback heuristic scoring, used when TYPESAFE_API_KEY is not set."""
     try:
         amount = float(transaction.get("amount", 0))
     except Exception:

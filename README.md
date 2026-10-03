@@ -169,6 +169,18 @@ $  docker-compose down -v   # for complete clean up
 Edit `services/ai-consumer/consumer.py` and implement your logic in `run_inference(transaction: dict) -> Optional[dict]`.
 Return a dict to publish to the `PREDICTIONS_TOPIC`, or `None` to skip publishing.
 
+### Jev-based scoring
+
+By default, fraud scoring is rule-based. Setting `TYPESAFE_API_KEY` switches the AI consumer to
+[Jev](https://typesafe.ai/blog/introducing-system-one-models-and-jev), a TypeSafe AI "System One" model that
+returns typed, calibrated risk decisions instead of free-text LLM output. See `services/ai-consumer/jev_inference.py`.
+
+```bash
+(kafka-env) $ cd services/ai-consumer
+(kafka-env) $ pip install -r requirements.txt
+(kafka-env) $ TYPESAFE_API_KEY=your_api_key KAFKA_BOOTSTRAP=localhost:29092 python consumer.py
+```
+
 
 ## REFERENCES & Links
 [Apache ECharts](https://echarts.apache.org/en/index.html)
